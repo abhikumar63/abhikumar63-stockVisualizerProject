@@ -2,17 +2,18 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import StockData
+from dotenv import load_dotenv
 
 import requests
 import json
-
-
-APIKEY = 'JFTXSG9N0Q5J3FBQ' 
-#replace 'my_alphav_api_key' with your actual Alpha Vantage API key obtained from https://www.alphavantage.co/support/#api-key
+import os
 
 
 DATABASE_ACCESS = True 
 #if False, the app will always query the Alpha Vantage APIs regardless of whether the stock data for a given ticker is already in the local database
+
+def configure():
+    load_dotenv()
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
@@ -25,6 +26,7 @@ def home(request):
 
 @csrf_exempt
 def get_stock_data(request):
+    configure()
     if is_ajax(request = request):
         #get ticker from the AJAX POST request
         ticker = request.POST.get('ticker', 'null')
@@ -39,7 +41,7 @@ def get_stock_data(request):
 
         #obtain stock data from Alpha Vantage APIs
         #get adjusted close data
-        price_series = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&apikey={APIKEY}&outputsize=full').json()
+        price_series = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&apikey={os.getenv('APIKEY')}&outputsize=full').json()
         
         #get SMA (simple moving average) data
         sma_series = requests.get(f'https://www.alphavantage.co/query?function=SMA&symbol={ticker}&interval=daily&time_period=10&series_type=close&apikey={APIKEY}').json()
