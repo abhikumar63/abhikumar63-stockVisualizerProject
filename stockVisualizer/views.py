@@ -44,7 +44,7 @@ def get_stock_data(request):
         price_series = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&apikey={os.getenv('APIKEY')}&outputsize=full').json()
         
         #get SMA (simple moving average) data
-        sma_series = requests.get(f'https://www.alphavantage.co/query?function=SMA&symbol={ticker}&interval=daily&time_period=10&series_type=close&apikey={APIKEY}').json()
+        sma_series = requests.get(f'https://www.alphavantage.co/query?function=SMA&symbol={ticker}&interval=daily&time_period=10&series_type=close&apikey={os.getenv('APIKEY')}').json()
 
         #package up the data in an output dictionary 
         output_dictionary = {}
